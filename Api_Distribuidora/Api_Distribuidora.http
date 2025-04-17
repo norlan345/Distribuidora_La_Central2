@@ -1,0 +1,6 @@
+@Api_Distribuidora_HostAddress = http://localhost:5237
+
+GET {{Api_Distribuidora_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

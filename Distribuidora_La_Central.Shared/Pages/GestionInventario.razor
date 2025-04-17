@@ -1,0 +1,88 @@
+﻿@page "/gestioninventario"
+
+<h3>Gestión de Inventario</h3>
+
+<div class="inventario-container">
+    <div class="lista-productos">
+        <h4>Lista de Productos</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Costo</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas vacías -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="productos">
+        <h4>Productos</h4>
+        <label>Código del producto:</label>
+        <input type="text" />
+        <label>Cantidad:</label>
+        <input type="text" />
+        <label>Costo:</label>
+        <input type="text" />
+        <label>Precio:</label>
+        <input type="text" />
+        <button>Añadir Producto</button>
+    </div>
+
+    <div class="seccion-bodegas">
+        <h4>Sección de Bodegas</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas vacías -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .inventario-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border: 2px solid black;
+        table-layout: fixed;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background: #f2f2f2;
+    }
+
+    .productos, .lista-productos, .seccion-bodegas {
+        border: 2px solid black;
+        padding: 15px;
+        background: white;
+    }
+</style>
+
+@code {
+    // Código C# para futuras funcionalidades
+}
