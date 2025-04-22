@@ -54,5 +54,55 @@ namespace Distribuidora_La_Central.Web.Controllers
                 return JsonConvert.SerializeObject(response);
             }
         }
+
+
+        [HttpPost("registrar-producto")]
+        public IActionResult RegistrarProducto([FromBody] Producto producto)
+        {
+            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("UsuarioAppCon"));
+
+            // Verificar si ya existe un producto con la misma descripción y proveedor
+            SqlDataAdapter checkProducto = new SqlDataAdapter("SELECT * FROM Producto WHERE descripcion = @descripcion AND idProveedor = @idProveedor", con);
+            checkProducto.SelectCommand.Parameters.AddWithValue("@descripcion", producto.descripcion);
+            checkProducto.SelectCommand.Parameters.AddWithValue("@idProveedor", producto.idProveedor);
+
+            DataTable dt = new DataTable();
+            checkProducto.Fill(dt);
+
+            if (dt.Rows.Count > 0)
+            {
+                return BadRequest("El producto ya existe con este proveedor.");
+            }
+
+            // Insertar el nuevo producto (sin especificar el código porque es IDENTITY)
+            SqlCommand cmd = new SqlCommand(@"INSERT INTO Producto 
+                (descripcion, cantidad, categoria, descuento, costo, bodega, idProveedor)
+                VALUES (@descripcion, @cantidad, @categoria, @descuento, @costo, @bodega, @idProveedor)", con);
+
+            cmd.Parameters.AddWithValue("@descripcion", producto.descripcion);
+            cmd.Parameters.AddWithValue("@cantidad", producto.cantidad);
+            cmd.Parameters.AddWithValue("@categoria", producto.categoria);
+            cmd.Parameters.AddWithValue("@descuento", producto.descuento);
+            cmd.Parameters.AddWithValue("@costo", producto.costo);
+            cmd.Parameters.AddWithValue("@bodega", producto.bodega);
+            cmd.Parameters.AddWithValue("@idProveedor", producto.idProveedor);
+
+            con.Open();
+            int i = cmd.ExecuteNonQuery();
+            con.Close();
+
+            if (i > 0)
+            {
+                return Ok("Producto registrado exitosamente");
+            }
+            else
+            {
+                return StatusCode(500, "Error al registrar producto");
+            }
+        }
+
+
+
+
     }
 }
