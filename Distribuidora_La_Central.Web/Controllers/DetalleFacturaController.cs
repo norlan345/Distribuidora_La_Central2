@@ -11,46 +11,55 @@ namespace Distribuidora_La_Central.Web.Controllers
     [ApiController]
     public class DetalleFacturaController : ControllerBase
     {
-        public readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
+
         public DetalleFacturaController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-        [HttpGet]
-        [Route("GetAllDetalles")]
-        public string GetDetalles()
+        [HttpGet("obtener-por-factura/{idFactura}")]
+        public string ObtenerDetallesPorFactura(int idFactura)
         {
-            SqlConnection con = new SqlConnection(_configuration.GetConnectionString("UsuarioAppCon").ToString());
-            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM DetalleFactura;", con);
-            DataTable dt = new DataTable();
+            using SqlConnection con = new(_configuration.GetConnectionString("UsuarioAppCon"));
+            SqlDataAdapter da = new(
+                @"SELECT df.*, p.descripcion as nombreProducto 
+                  FROM DetalleFactura df
+                  INNER JOIN Producto p ON df.idProducto = p.idProducto
+                  WHERE df.idFactura = @idFactura", con);
+
+            da.SelectCommand.Parameters.AddWithValue("@idFactura", idFactura);
+
+            DataTable dt = new();
             da.Fill(dt);
-            List<DetalleFactura> detalleList = new List<DetalleFactura>();
-            Response response = new Response();
+
+            List<DetalleFactura> detalles = new();
+            Response response = new();
 
             if (dt.Rows.Count > 0)
             {
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
-                    DetalleFactura detalle = new DetalleFactura();
-                    detalle.idDetalle = Convert.ToInt32(dt.Rows[i]["idDetalle"]);
-                    detalle.codigoFactura = Convert.ToInt32(dt.Rows[i]["codigoFactura"]);
-                    detalle.codigoProducto = Convert.ToInt32(dt.Rows[i]["codigoProducto"]);
-                    detalle.cantidad = Convert.ToInt32(dt.Rows[i]["cantidad"]);
-                    detalle.precioUnitario = Convert.ToDecimal(dt.Rows[i]["precioUnitario"]);
-                    detalle.subtotal = Convert.ToDecimal(dt.Rows[i]["subtotal"]);
-                    detalleList.Add(detalle);
+                    DetalleFactura detalle = new()
+                    {
+                        idDetalle = Convert.ToInt32(dt.Rows[i]["idDetalle"]),
+                        codigoFactura = Convert.ToInt32(dt.Rows[i]["idFactura"]),
+                        codigoProducto = Convert.ToInt32(dt.Rows[i]["idProducto"]),
+                     
+                        cantidad = Convert.ToInt32(dt.Rows[i]["cantidad"]),
+                        precioUnitario = Convert.ToDecimal(dt.Rows[i]["precioUnitario"]),
+                        subtotal = Convert.ToDecimal(dt.Rows[i]["subtotal"])
+                    };
+                    detalles.Add(detalle);
                 }
             }
 
-            if (detalleList.Count > 0)
-            {
-                return JsonConvert.SerializeObject(detalleList);
-            }
+            if (detalles.Count > 0)
+                return JsonConvert.SerializeObject(detalles);
             else
             {
                 response.StatusCode = 100;
-                response.ErrorMessage = "No data found";
+                response.ErrorMessage = "No se encontraron detalles para esta factura.";
                 return JsonConvert.SerializeObject(response);
             }
         }

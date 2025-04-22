@@ -9,4 +9,11 @@
         public decimal saldo { get; set; }
         public string tipo { get; set; }
     }
+
+
+    public class FacturaConDetalle
+    {
+        public Factura Factura { get; set; }
+        public List<DetalleFactura> Detalles { get; set; }
+    }
 }
